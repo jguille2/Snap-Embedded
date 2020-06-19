@@ -20,3 +20,15 @@ Nor we can't use option flags like _embedMode_, _editMode_, _noRun_, _hideContro
 | :exclamation:  This will be checked but we don't need this if we control our embedded Snap! from JS code.   |
 |-------------------------------------------------------------------------------------------------------------|
 
+### About CORS headers
+To create a simple _xml_ repo on a folder, we can add these headers with a _.htaccess_ file
+```
+<FilesMatch "\.(xml)$">
+  <IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "*"
+  </IfModule>
+</FilesMatch>
+```
+
+## Embedding Snap! inside our code (to add controls from our app)
+See (src) code...

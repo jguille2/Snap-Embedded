@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Snap! Embedded</title>
+        <link rel="shortcut icon" href="snap/src/favicon.ico">
+        <style>
+            .button {
+                background-color: #4CAF50;
+                border: none;
+                color: white;
+                padding: 15px 25px;
+                text-align: center;
+                font-size: 16px;
+                cursor: pointer;
+            }
+            .button:hover {
+                background-color: green;
+            }
+        </style>
+        <script>
+            // globals (for this testing page!)
+            function init() {
+                snapFrame = document.getElementById("snap"),
+                snapWorld = snapFrame.contentWindow.world,
+                snapIDE = snapWorld.children[0];
+                customize();
+            };
+
+            // newProject() starts an empty new Snap! project and resets "projectName" field
+            function newProject() {
+                snapIDE.newProject();
+                document.getElementById("projectName").value = "projectName";
+            };
+
+            // saveProject() sets Snap! projectName to [projectName field] and return  current renamed project serialized
+            function saveProject() {
+                var projectName = document.getElementById("projectName").value;
+                snapIDE.setProjectName(projectName);
+                return snapIDE.serializer.serialize(snapIDE.stage);
+            };
+
+            // loadProject(xml) load a Snap! object (project, library, sprite...) into our Snap! embedded frame.
+            function loadProject(aString) {
+                  snapIDE.droppedText(aString);
+                  document.getElementById("projectName").value = snapIDE.projectName;
+            };
+
+            //customize() decorates original Snap! preventing errors from missing cloud features.
+            function customize() {
+                snapFrame.contentWindow.IDE_Morph.prototype.originalSnapMenu = snapFrame.contentWindow.IDE_Morph.prototype.snapMenu;
+                snapFrame.contentWindow.IDE_Morph.prototype.snapMenu = function () {
+                    this.originalSnapMenu();
+                    var menu = this.world().activeMenu;
+                    // Snap! Embedded info...
+                    menu.addLine();
+                    menu.addItem('This is Snap! Embedded');
+                    menu.popup(this.world(), this.logo.bottomLeft());
+                };
+                snapFrame.contentWindow.IDE_Morph.prototype.cloudMenu = function () {
+                    this.showMessage('cloud unavailable from Snap! embedded');
+                    return;
+                };
+            };
+        </script>
+    </head>
+    <body onload="init();">
+        <div>
+            <button class="button" onClick="newProject();">New</button>
+            <span style="margin: 0px 10px 0 10px">
+                <input type="text" id="projectName" name="projectName" value="projectName">
+            </span>
+            <button class="button" onClick="document.getElementById('xmlProject').value = saveProject();">Save</button>
+            <button class="button" onClick="loadProject(document.getElementById('xmlProject').value);">Load</button>
+        </div>
+        <iframe src="snap/snap.html" id="snap" width="1000px" height="800px"></iframe>
+        <br><br>
+        <textarea id="xmlProject" name="xmlProject" rows="40" cols="200"></textarea>
+    </body>
+</html>
